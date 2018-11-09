@@ -19,3 +19,7 @@ https://lldb.llvm.org/lldb-gdb.html
 ### read content of registers
 
 register read
+
+## dif of mov and lea
+
+https://stackoverflow.com/questions/1699748/what-is-the-difference-between-mov-and-lea
