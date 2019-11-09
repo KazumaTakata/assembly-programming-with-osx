@@ -5,10 +5,14 @@
         extern  _printf
 
         section .text
+
+
 _main:
-        push    rbp                    ; we have to save this since we use it
+        push    rbp                   ;setup stackframe
         mov     rbp, rsp
-        sub     rsp, 16 
+        sub     rsp, 16               ;get 16byte space. +0 
+
+
         mov     ecx, 10
        
         mov     rax, 45 
@@ -28,8 +32,8 @@ print:
         add     rax, 1
         mov     qword [rsp + 16], rax
 
-        dec     ecx
-        jnz     print
+        dec     ecx      ;decriment ecx, result affect zf flag.
+        jnz     print    ;if zf flag is not zero, jump to print label.
 
         mov     rsp, rbp 
         pop     rbp
