@@ -23,3 +23,10 @@ register read
 ## dif of mov and lea
 
 https://stackoverflow.com/questions/1699748/what-is-the-difference-between-mov-and-lea
+
+
+reference
+
+http://flint.cs.yale.edu/cs421/papers/x86-asm/asm.html
+https://cs.lmu.edu/~ray/notes/nasmtutorial/
+https://eli.thegreenplace.net/2011/09/06/stack-frame-layout-on-x86-64/
