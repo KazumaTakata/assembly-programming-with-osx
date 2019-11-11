@@ -3,12 +3,40 @@
 
         global  _main
         extern  _printf
+        extern  _init_vec3
+        extern _copy_vec3
+        extern  _scala_mul_vec3
+        extern  _add_vec3   
+        extern _color
+
+ 
+        section .data
+        struc  Vec3
+.x       resq 1 
+.y       resq 1
+.z       resq 1
+        endstruc
+
+zero_double: dq 0.0
+one_double: dq 1.0
+four_double: dq 4.0
+two_double: dq 2.0
+m_two_double: dq -2.0
+m_one_double: dq -1.0
 
         section .text
 
-b  equ  32
-g  equ  24
-r  equ  16 
+u   equ    96
+v   equ    88
+color      equ 80
+direction  equ 72
+u_horizontal equ 64
+v_vertical equ  56
+origin    equ  48
+vertical  equ  40
+horizontal  equ  32
+lower_left  equ  24 
+ray equ 16
 nx equ  12
 ny equ  8
 i  equ  4
@@ -20,7 +48,7 @@ j  equ  0
 format:  db  "x: %d", 10, 0
 format2: db  "y: %f", 10, 0
 initB:   dq  0.2
-rbgMax:  dq  255.99
+rbgMax:  dq  255.00
 header:  db "P3", 10, 0
 format_digit_space: db "%d ",0
 format_digit_newline: db "%d", 10, 0
@@ -29,10 +57,43 @@ format_digit_newline: db "%d", 10, 0
 _main:
         push    rbp                   ;setup stackframe
         mov     rbp, rsp
-        sub     rsp, 48               ;get 16byte space. +0 
+        sub     rsp, 112               ;get 16byte space. +0 
 
         mov     dword [rsp + nx], 200 ;local variable initialization
         mov     dword [rsp + ny], 100
+
+        movsd   xmm0, [rel m_two_double]
+        movsd   xmm1, [rel m_one_double]
+        movsd   xmm2, [rel m_one_double]
+        
+        call _init_vec3
+        mov   [rsp + lower_left] , rax
+    
+
+        movsd   xmm0, [rel four_double]
+        movsd   xmm1, [rel zero_double]
+        movsd   xmm2, [rel zero_double]
+        
+        call _init_vec3
+        mov   [rsp + horizontal] , rax
+    
+ 
+        movsd   xmm0, [rel zero_double]
+        movsd   xmm1, [rel two_double]
+        movsd   xmm2, [rel zero_double]
+        
+        call _init_vec3
+        mov   [rsp + vertical] , rax
+    
+ 
+        movsd   xmm0,[rel zero_double]
+        movsd   xmm1,[rel zero_double]
+        movsd   xmm2,[rel zero_double]
+        
+        call _init_vec3
+        mov   [rsp + origin] , rax
+    
+  
         
         ;print P3 
         xor     rax, rax
@@ -89,22 +150,68 @@ loop_row:
         ; r
         cvtsi2sd  xmm0, dword [rsp + i]
         cvtsi2sd  xmm1, dword [rsp + nx]
+        ; u
         divsd     xmm0, xmm1 
-        movsd   qword [rsp + r]  , xmm0        
-        
+        movsd   qword [rsp + u]  , xmm0        
+       
+
+        mov   rdi, [rsp + horizontal]
+        call _copy_vec3 
+       
+        mov   rdi, rax 
+        mov   [rsp + u_horizontal], rax
+        movsd   xmm0, [rsp + u]
+        call _scala_mul_vec3
+    
+ 
         ;g
         cvtsi2sd  xmm0, dword [rsp + j]
         cvtsi2sd  xmm1, dword [rsp + ny]
         divsd     xmm0, xmm1 
-        movsd   qword [rsp + g]  , xmm0        
+        movsd   [rsp + v]  , xmm0        
 
-        ;b
-        movsd   xmm0 , [rel initB]
-        movsd   qword[rsp + b] , xmm0 
+        mov   rdi, [rsp + vertical]
+        call _copy_vec3 
+       
+        mov   rdi, rax 
+        mov   [rsp + v_vertical], rax
+        movsd  xmm0, [rsp + v]
+        call _scala_mul_vec3
     
+        ;direction 
+
+        movsd   xmm0, [rel zero_double]
+        movsd   xmm1, [rel zero_double]
+        movsd   xmm2, [rel zero_double]
+        
+        call _init_vec3
+        mov   [rsp + direction] , rax
+        
+        mov  rdi, [rsp + direction]
+        mov  rsi, [rsp + u_horizontal]
+        call _add_vec3
+
+        
+        mov  rdi, [rsp + direction]
+        mov  rsi, [rsp + v_vertical]
+        call _add_vec3
+
+        mov  rdi, [rsp + direction]
+        mov  rsi, [rsp + lower_left]
+        call _add_vec3
+
+
+        mov  rdi, [rsp + origin]
+        mov  rsi, [rsp + direction]
+       
+        call _color
+
+        mov  [rsp + color] , rax
+
 
         ; generate ir
-        movsd   xmm0, qword [rsp + r]        
+        mov   rax, [rsp + color]
+        movsd   xmm0, qword [rax + Vec3.x]         
         mulsd   xmm0, [rel rbgMax]
 
         xor     rax, rax
@@ -116,7 +223,8 @@ loop_row:
         call    _printf 
 
         ; generate ig
-        movsd   xmm0, qword [rsp + g]        
+        mov   rax, [rsp + color]
+        movsd   xmm0, qword [rax + Vec3.y]  
         mulsd   xmm0, [rel rbgMax]
 
         xor     rax, rax
@@ -128,8 +236,10 @@ loop_row:
         call    _printf 
 
         ; generate ib
-        movsd   xmm0, qword [rsp + b]        
+        mov   rax, [rsp + color]
+        movsd   xmm0, qword [rax + Vec3.z]  
         mulsd   xmm0, [rel rbgMax]
+;        subsd   xmm0, [rel one_double]
 
         xor     rax, rax
         cvtsd2si  eax, xmm0
