@@ -7,6 +7,10 @@
         extern  _print_vec3
         extern  _add_vec3
         extern  _sub_vec3
+        extern  _init_vec3
+        extern  _copy_vec3
+        extern  _scala_mul_vec3
+        extern  _unit_vec3
 
         section .data
         struc  Vec3
@@ -53,31 +57,20 @@ _main:
 
         mov     rdi, [rsp + 0]
         call    _print_vec3
-        leave                     ; restore rbx before returning
-        ret
 
+        mov     rdi, [rsp + 0]
+        call    _copy_vec3
 
+        mov     rdi, rax
+        call    _unit_vec3
 
-_init_vec3:
-        push    rbp
-        mov     rbp, rsp
-        sub     rsp, 32
+        mov     rdi, rax
+        call    _print_vec3
+
         
-        ;x y z
-        movsd     [rsp + 0], xmm0
-        movsd     [rsp + 8], xmm1
-        movsd     [rsp + 16], xmm2
- 
-        mov     rdi, Vec3_size
-        call    _malloc ;return addr in rax
-        
-        movsd     xmm0 , [rsp + 0]
-        movsd     qword [rax + Vec3.x], xmm0
-        movsd     xmm0, [rsp + 8]
-        movsd     qword [rax + Vec3.y], xmm0
-        movsd     xmm0, [rsp + 16] 
-        movsd     qword [rax + Vec3.z], xmm0
-
-
         leave
+
         ret
+
+
+
