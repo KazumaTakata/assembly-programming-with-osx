@@ -14,8 +14,10 @@ z       resq 1
 
         section .text
 
-format:  db  "x: %d", 10, 0
+format_vector:  db  "(%d, %d, %d)", 10, 0
 format2: db  "y: %f", 10, 0
+
+vector_add  equ 0
 
 _main:
         push    rbp                   ;setup stackframe
@@ -46,12 +48,21 @@ print_vec3:
         mov     rbp, rsp
         sub     rsp, 16
 
-        mov     [rsp + 0], rdi
-        mov     rax, [rsp + 0]
+        mov     [rsp + vector_add], rdi
+        mov     rax, [rsp + vector_add]
         mov     rcx , qword [rax + x]
-        
-        lea     rdi, [rel format]
-        mov     rsi, rcx 
+        mov     rsi, rcx
+ 
+        mov     [rsp + vector_add], rdi
+        mov     rax, [rsp + vector_add]
+        mov     rcx , qword [rax + y]
+        mov     rdx, rcx 
+  
+        mov     [rsp + vector_add], rdi
+        mov     rax, [rsp + vector_add]
+        mov     rcx , qword [rax + z]
+      
+        lea     rdi, [rel format_vector]
         call    _printf
 
         leave

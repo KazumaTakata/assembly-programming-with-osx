@@ -32,3 +32,5 @@ http://flint.cs.yale.edu/cs421/papers/x86-asm/asm.html
 https://cs.lmu.edu/~ray/notes/nasmtutorial/
 
 https://eli.thegreenplace.net/2011/09/06/stack-frame-layout-on-x86-64/
+
+https://stackoverflow.com/questions/8187028/how-to-link-two-nasm-source-files

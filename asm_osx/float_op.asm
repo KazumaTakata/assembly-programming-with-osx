@@ -33,7 +33,7 @@ _main:
         mov     eax, dword [rsp + nx]
         
         movsd    xmm1, [rel double1] 
-        ;printf xmm0:double number, rax:#varargs argument, rdi:format data
+        ;printf xmm0:double number, rax:#vector(float) argument, rdi:format data
         cvtsi2sd  xmm0, rax 
         addsd   xmm0, xmm1
         lea     rdi, [rel format]
