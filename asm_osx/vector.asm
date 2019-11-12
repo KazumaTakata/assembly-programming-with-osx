@@ -8,6 +8,7 @@
         global _copy_vec3
         global _scala_mul_vec3
         global _unit_vec3
+        global _dot_vec3
     
         section .data
         struc  Vec3
@@ -114,6 +115,28 @@ _sub_vec3:
         leave
         ret
         
+
+_dot_vec3:
+       movsd   xmm0,  [rel zero_double]
+       
+       movsd   xmm1,  [rsi + Vec3.x] 
+       movsd   xmm2,  [rdi + Vec3.x]
+       mulsd   xmm1, xmm2
+       addsd   xmm0, xmm1
+        
+       movsd   xmm1,  [rsi + Vec3.y] 
+       movsd   xmm2,  [rdi + Vec3.y]
+       mulsd   xmm1, xmm2
+       addsd   xmm0, xmm1
+        
+       movsd   xmm1,  [rsi + Vec3.z] 
+       movsd   xmm2,  [rdi + Vec3.z]
+       mulsd   xmm1, xmm2
+       addsd   xmm0, xmm1
+       
+
+       ret
+
 
 _length_vec3:
        movsd   xmm0,  [rel zero_double]
