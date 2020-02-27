@@ -1,10 +1,11 @@
 
 ## command
 
+```
 nasm -fmacho64 -g main.asm
 gcc main.o
 ./a.out
-
+```
 
 
 ## osx assembly
