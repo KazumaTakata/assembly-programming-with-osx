@@ -39,7 +39,7 @@ vec1   equ  32
 vec2   equ  40
 origin_c equ 48
 direction_c equ 56
-
+disc   equ 64
 
 center equ 0
 radius equ 16 
@@ -102,8 +102,35 @@ _hit_sphere:
 
     subsd   xmm0, xmm1
 
-    
+
+
+    ucomisd  xmm0, [rel zero_double]
+
+    jae  disc_more_than_zero
+  
+
+
+    movsd    xmm0, [rel m_one_double] 
     leave
+    ret
+
+
+disc_more_than_zero:
+
+    sqrtsd  xmm0, xmm0
+    movsd  xmm1, [rsp + b]
+    movsd  xmm2, [rel zero_double]
+    subsd  xmm2, xmm1
+
+    subsd  xmm2, xmm0
+    movsd  xmm0, [rel two_double]
+    mulsd  xmm0, [rsp + a]
+    divsd  xmm2, xmm0
+
+    movsd  xmm0, xmm2
+
+
+    leave 
     ret
 
  
@@ -111,7 +138,7 @@ _hit_sphere:
 _color: 
     push    rbp
     mov     rbp, rsp
-    sub     rsp, 64
+    sub     rsp, 80 
 
 
     mov     [rsp + origin], rdi
@@ -137,7 +164,7 @@ _color:
     mov   rdx, [rsp + direction_c] 
    
     call _hit_sphere    
-    
+    movsd  [rsp + disc], xmm0    
     ucomisd xmm0, [rel zero_double]
 
 
@@ -199,13 +226,50 @@ _color:
 
 
  hit:
+
+    mov    rdi, [rsp + direction]
+    call   _copy_vec3
+
+    mov    [rsp + direction_c], rax  
+  
+    mov    rdi, [rsp + direction_c]
+    movsd   xmm0, [rsp + disc ] 
+    call _scala_mul_vec3
+
     
-    movsd   xmm0, [rel one_double]
+    movsd   xmm0, [rel zero_double]
     movsd   xmm1, [rel zero_double]
-    movsd   xmm2, [rel zero_double]
+    movsd   xmm2, [rel m_one_double]
         
     call _init_vec3
+
+    mov    rsi, rax
+    mov    rdi, [rsp + direction_c]
+
+    call  _sub_vec3 
    
+
+    mov    rdi, [rsp + direction_c]
+    call   _unit_vec3
+
+     
+    movsd   xmm0, [rel one_double]
+    movsd   xmm1, [rel one_double]
+    movsd   xmm2, [rel one_double]
+        
+    call _init_vec3
+
+    mov   rsi, rax
+    mov   rdi, [rsp + direction_c]
+
+    call _add_vec3
+
+    movsd xmm0, [rel half_double]
+    mov   rdi,  [rsp + direction_c]
+    call _scala_mul_vec3
+
+    mov  rax, [rsp + direction_c]
+
     leave 
     ret 
 
