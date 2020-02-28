@@ -40,6 +40,13 @@ loop:
     ret
 
 
+clear_buffer:
+    
+
+
+
+
+
 
     section   .bss
 
